@@ -41,7 +41,7 @@ impl Arguments {
           Some(_) => {
             output = OsString::from(_output.to_str().unwrap());
           },
-          None => return Err("Output file wrong format!".to_string()),
+          _=> return Err("Output file wrong format!".to_string()),
         };
       }
       _=>(),

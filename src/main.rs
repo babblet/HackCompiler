@@ -1,5 +1,6 @@
 use ::std::ffi::OsString;
 use hack_compiler::arguments::Arguments;
+use hack_compiler::analyzer::SyntaxAnalyzer;
 
 fn main() {
   let environment_arguments: Vec<OsString> = std::env::args_os().collect();
@@ -10,4 +11,8 @@ fn main() {
       return ();
     }
   };
+
+  //let analyzer = SyntaxAnalyzer(arguments.input, arguments.output)
+  
+
 }
