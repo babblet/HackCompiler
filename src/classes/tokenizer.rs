@@ -1,4 +1,4 @@
-use super::grammar;
+use crate::enums::grammar;
 use std::ffi::OsString;
 
 pub struct Tokenizer {}

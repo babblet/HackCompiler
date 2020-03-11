@@ -1,6 +1,6 @@
 use ::std::ffi::OsString;
-use hack_compiler::arguments::Arguments;
-use hack_compiler::analyzer::SyntaxAnalyzer;
+use hack_compiler::classes::arguments::Arguments;
+use hack_compiler::classes::analyzer::SyntaxAnalyzer;
 
 fn main() {
   let environment_arguments: Vec<OsString> = std::env::args_os().collect();
