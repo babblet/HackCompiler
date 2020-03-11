@@ -13,6 +13,4 @@ fn main() {
   };
 
   //let analyzer = SyntaxAnalyzer(arguments.input, arguments.output)
-  
-
 }

@@ -1,4 +1,7 @@
 use std::path::Path;
+use std::fs::File;
+use std::io::Read;
+use std::ffi::OsString;
 
 pub struct CompilationEngine {
   input_lines: Vec<OsString>,
@@ -6,19 +9,19 @@ pub struct CompilationEngine {
 
 impl CompilationEngine {
   pub fn new(input: &Path, output: &Path) -> Result<CompilationEngine, String> {
-    let mut in_file: File = match File::open(path) {
+    let mut in_file: File = match File::open(input) {
       Ok(file) => file,
-      Err(e) => panic!("Failed to load {}: {}", path.to_str().unwrap(), e)
+      Err(e) => panic!("Failed to load {}: {}", input.to_str().unwrap(), e)
     };
 
-    let file_name = match path.file_name() {
+    let file_name = match input.file_name() {
       Some(file_name) => file_name.to_os_string(),
       None => OsString::from(""),
     };
 
     let mut buffer = String::new();
     match in_file.read_to_string(&mut buffer) {
-      Ok(size) => println!("Read {} bytes from {}", size, path.to_str().unwrap()),
+      Ok(size) => println!("Read {} bytes from {}", size, input.to_str().unwrap()),
       Err(e) => println!("Was unable to read from file: {}", e),
     };
 
