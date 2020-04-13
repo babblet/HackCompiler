@@ -1,13 +1,14 @@
 use crate::grammar::LexicalElement;
 use crate::grammar::SYMBOLS;
+use crate::grammar::KEYWORDKEYS;
 use crate::models::token::Token;
 use std::slice::Iter;
 use std::ffi::OsString;
 use std::str::Chars;
 
 pub struct Tokenizer {
-  input: Vec<char>,
-  input_index: usize,
+  pub input: Vec<char>,
+  pub input_index: usize,
 }
 
 impl Tokenizer {
@@ -72,7 +73,7 @@ impl Tokenizer {
   }
 }
 
-fn create_token(input: &String) -> Option<Token> {
+pub fn create_token(input: &String) -> Option<Token> {
   match find_token_type(input) {
     Some(token_type) => {
       Some(Token {
@@ -83,20 +84,26 @@ fn create_token(input: &String) -> Option<Token> {
     },
     _ => {
       match find_keyword(input) {
-        Some(keyword_key) => {
-          Some(Token {
-            element: LexicalElement::Keyword,
-            data: input.to_string(),
-            keyword_key: Some(keyword_key),
-          })
-        },
-        _ => None,
+        Some(key) => Some(Token {
+          element: LexicalElement::Keyword,
+          data: input.to_string(),
+          keyword_key: Some(key),
+        }),
+        _=> None,
       }
     },
   }
 }
 
-fn find_token_type(input: &String) -> Option<LexicalElement> {
+pub fn create_identifier_token(input: &String) -> Token {
+  Token {
+    element: LexicalElement::Identifier,
+    data: input.to_string(),
+    keyword_key: None,
+  }
+}
+
+pub fn find_token_type(input: &String) -> Option<LexicalElement> {
   if is_symbol(input) {
     return Some(LexicalElement::Symbol);
   } else if is_integer_constant(input) {
@@ -108,7 +115,7 @@ fn find_token_type(input: &String) -> Option<LexicalElement> {
   }
 }
 
-fn is_symbol(input: &String) -> bool {
+pub fn is_symbol(input: &String) -> bool {
   for symbol in SYMBOLS {
     if input == &symbol.to_string() {
       return true;
@@ -119,31 +126,32 @@ fn is_symbol(input: &String) -> bool {
   return false;
 }
 
-fn is_integer_constant(input: &String) -> bool {
-  false
+pub fn is_integer_constant(input: &String) -> bool {
+  return match input.parse::<u16>() {
+    Ok(i) => if i <= 2u16.pow(15) { true } else { false },
+    _=> false,
+  }
 }
 
-fn is_string_constant(input: &String) -> bool {
-  false
+pub fn is_string_constant(input: &String) -> bool {
+  let mut count: usize = 0;
+  for c in input.chars() {
+    if c == '"' {
+      count = count + 1;
+    }
+  }
+  if count == 2 { true } else { false }
 }
 
-fn find_keyword(input: &String) -> Option<String>{
+pub fn find_keyword(input: &String) -> Option<&'static str> {
+  for key in KEYWORDKEYS {
+    if input == key {
+      return Some(*key);
+    }
+  }
   None
 }
 
-fn create_identifier_token(input: &String) -> Token {
-  Token {
-    element: LexicalElement::Identifier,
-    data: input.to_string(),
-    keyword_key: None,
-  }
-}
-
-fn is_whitespace(c: char) -> bool {
-  if c == ' '  ||
-     c == '\t' {
-    return true;
-  } else {
-    return false
-  }
+pub fn is_whitespace(c: char) -> bool {
+  if c == ' '  || c == '\t' { true } else { false }
 }

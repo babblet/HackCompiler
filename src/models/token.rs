@@ -5,5 +5,5 @@ use crate::grammar::LexicalElement;
 pub struct Token {
   pub element: LexicalElement,
   pub data: String,
-  pub keyword_key: Option<String>
+  pub keyword_key: Option<&'static str>
 }

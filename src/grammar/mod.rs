@@ -1,3 +1,4 @@
+#[derive(PartialEq, Eq, Copy, Clone, Debug)]
 pub enum LexicalElement {
   Keyword,
   Symbol,
@@ -7,6 +8,7 @@ pub enum LexicalElement {
 
 }
 
+#[derive(PartialEq, Eq, Copy, Clone, Debug)]
 pub enum ProgramStructure {
   Class,
   ClassVarDec,
@@ -20,6 +22,7 @@ pub enum ProgramStructure {
   VarName,
 }
 
+#[derive(PartialEq, Eq, Copy, Clone, Debug)]
 pub enum Statements {
   Statements,
   Statement,
@@ -30,6 +33,7 @@ pub enum Statements {
   ReturnStatement,
 }
 
+#[derive(PartialEq, Eq, Copy, Clone, Debug)]
 pub enum Expression {
   Expression,
   Term,
@@ -40,7 +44,7 @@ pub enum Expression {
   KeywordConstant,
 }
 
-pub mod KeywordKeys {
+pub mod keyword {
   pub const CLASS: &'static str = "class";
   pub const METHOD: &'static str = "method";
   pub const FUNCTION: &'static str = "function";
@@ -63,5 +67,29 @@ pub mod KeywordKeys {
   pub const NULL: &'static str = "null";
   pub const THIS: &'static str = "this";
 }
+
+pub static KEYWORDKEYS: &'static [&'static str] = &[
+  keyword::CLASS,
+  keyword::METHOD,
+  keyword::FUNCTION,
+  keyword::CONSTRUCTOR,
+  keyword::INT,
+  keyword::BOOLEAN,
+  keyword::CHAR,
+  keyword::VOID,
+  keyword::VAR,
+  keyword::STATIC,
+  keyword::FIELD,
+  keyword::LET,
+  keyword::DO,
+  keyword::IF,
+  keyword::ELSE,
+  keyword::WHILE,
+  keyword::RETURN,
+  keyword::TRUE,
+  keyword::FALSE,
+  keyword::NULL,
+  keyword::THIS
+];
 
 pub static SYMBOLS: &'static [char] = &['{','}','(',')','[',']','.',',',';','+','-','*','/','&','|','<','>','=','~'];

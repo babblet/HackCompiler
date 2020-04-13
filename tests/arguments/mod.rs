@@ -3,7 +3,5 @@ mod arguments {
   use hack_compiler::classes::arguments::Arguments;
 
   #[test]
-  fn new() {
-    let arguments = Arguments;
-  }
+  fn new() {}
 }

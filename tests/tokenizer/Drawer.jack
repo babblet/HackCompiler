@@ -1,0 +1,36 @@
+// This can be made more effective by drawing with memory.poke();
+class Drawer {
+    function void draw(Array data, int width, int height, int posX, int posY) {
+        var int x;
+        var int y;
+        var int address;
+
+        if (Helpers.and(
+            Helpers.and(
+                (width  + posX) < 512,
+                (width  + posX) > -1
+            ),
+            Helpers.and(
+                (height + posY) < 256,
+                (height + posY) > -1
+            )
+        )) {
+            let y = 0;
+            while(y < height) {
+                let x = 0;
+                while(x < width) {
+                    if (data[(y * width) + x]) {
+                        do Screen.setColor(true);
+                    } else {
+                        do Screen.setColor(false);
+                    }
+                    do Screen.drawPixel(x + posX, y + posY);
+                    let x = x + 1;
+                }
+                let y = y + 1;
+            }
+        }
+        do data.dispose();
+        return;
+    } 
+}
