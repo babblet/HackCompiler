@@ -4,6 +4,6 @@ mod arguments {
 
   #[test]
   fn new() {
-    assert_eq!(true, true) 
+    let arguments = Arguments;
   }
 }
