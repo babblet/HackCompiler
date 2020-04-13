@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 use std::ffi::OsString;
-use crate::enums::grammar::LexicalElement;
+use crate::grammar::LexicalElement;
 
-struct Token {
-  type: LexicalElement,
-  data: String,
-  keyword_key: Option<String>
+pub struct Token {
+  pub element: LexicalElement,
+  pub data: String,
+  pub keyword_key: Option<String>
 }

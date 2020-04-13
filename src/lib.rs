@@ -1,2 +1,3 @@
-pub mod enums;
+pub mod grammar;
+pub mod models;
 pub mod classes;

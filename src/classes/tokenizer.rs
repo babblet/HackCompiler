@@ -1,53 +1,68 @@
-use crate::enums::grammar::LexicalElement;
-use crate::enums::grammar::SYMBOLS;
-use crate::models::Token;
+use crate::grammar::LexicalElement;
+use crate::grammar::SYMBOLS;
+use crate::models::token::Token;
 use std::slice::Iter;
 use std::ffi::OsString;
 use std::str::Chars;
 
 pub struct Tokenizer {
-  input: Chars,
+  input: Vec<char>,
+  input_index: usize,
 }
 
 impl Tokenizer {
   pub fn new(input_lines: &Vec<OsString>) -> Tokenizer {
-    let input = String::new();
-
     //Implement comment removal later
-    for _line in input_lines {
-      match _line.into_string(self) {
-        Ok(line) => input = [input, line].concat(),
-        _ => continue,
-      };
+    let mut input: Vec<char> = Vec::new();
+    let mut cc = false;
+
+    for _line in input_lines.iter() {
+      match (*_line).clone().into_string() {
+        Ok(line) => {
+          let chars = line.chars();
+          for c in chars {
+            if c == '/' { if cc { break}; cc = true; } else { cc = false }
+            input.push(c);
+          }
+        },
+        _=> continue,
+      }
     }
     Tokenizer {
-      input: input.chars(),
+      input: input,
+      input_index: 0,
     }
   }
-  
-  pub fn advance(self) -> Option<Token> {
-    let current_build = String::new();
+
+  fn next(&mut self) -> Option<char> {
+    if self.input_index > self.input.len() { return None; }
+    self.input_index = self.input_index + 1;
+    return Some(self.input[self.input_index - 1]);
+  }
+
+  pub fn advance(&mut self) -> Option<Token> {
+    let mut current_build = String::new();
 
     loop {
-      match self.input.next() {
+      match self.next() {
         Some(c) => {
           if is_whitespace(c) {
             if current_build.len() > 0 {
-              break create_identifier_token(current_build); 
+              break Some(create_identifier_token(&current_build));
             } else {
               continue;
             }
           }
           current_build.push(c);
-          
-          match create_token(current_build) {
-            Some(token) => break token,
-            None => continue;
+
+          match create_token(&current_build) {
+            Some(token) => break Some(token),
+            None => continue,
           };
         },
         None => {
           if current_build.len() > 0 {
-            break create_identifier_token(current_build);
+            break Some(create_identifier_token(&current_build));
           } else {
             break None;
           }
@@ -55,82 +70,80 @@ impl Tokenizer {
       }
     }
   }
+}
 
-  fn remove_comment(line: String) {
-
+fn create_token(input: &String) -> Option<Token> {
+  match find_token_type(input) {
+    Some(token_type) => {
+      Some(Token {
+        element: token_type,
+        data: input.to_string(),
+        keyword_key: None,
+      })
+    },
+    _ => {
+      match find_keyword(input) {
+        Some(keyword_key) => {
+          Some(Token {
+            element: LexicalElement::Keyword,
+            data: input.to_string(),
+            keyword_key: Some(keyword_key),
+          })
+        },
+        _ => None,
+      }
+    },
   }
+}
 
-  fn is_whitespace(c: char) {
-    if c == ' '  ||
-       c == '\t' {
+fn find_token_type(input: &String) -> Option<LexicalElement> {
+  if is_symbol(input) {
+    return Some(LexicalElement::Symbol);
+  } else if is_integer_constant(input) {
+    return Some(LexicalElement::IntegerConstant);
+  } else if is_string_constant(input) {
+    return Some(LexicalElement::StringConstant);
+  } else {
+    return None;
+  }
+}
+
+fn is_symbol(input: &String) -> bool {
+  for symbol in SYMBOLS {
+    if input == &symbol.to_string() {
       return true;
     } else {
-      return false
+      continue
     }
   }
+  return false;
+}
 
-  fn create_identifier_token(input: String) -> Token {
-    Token {
-      type: LexicalElement::IDENTIFIER,
-      data: input,
-      keyword_key: None,
-    }
+fn is_integer_constant(input: &String) -> bool {
+  false
+}
+
+fn is_string_constant(input: &String) -> bool {
+  false
+}
+
+fn find_keyword(input: &String) -> Option<String>{
+  None
+}
+
+fn create_identifier_token(input: &String) -> Token {
+  Token {
+    element: LexicalElement::Identifier,
+    data: input.to_string(),
+    keyword_key: None,
   }
+}
 
-  fn create_token(input: String) -> Option<Token> {
-    match find_token_type(input) {
-      Some(token_type) => {
-        Token {
-          type: token_type,
-          data: input,
-          keyword_key: None,
-        }
-      },
-      _ => {
-        match find_keyword(input) {
-          Some(keyword_key) {
-            Token {
-              type: LexicalElement::Keyword,
-              data: input,
-              keyword_key: keyword_key,
-            }
-          },
-          _ => None,
-        }
-      },
-    }
-  }
-
-  fn find_token_type(input: String) -> Option<LexicalElement> {
-    if is_symbol(input) {
-      return Some(LexicalElement::Symbol);
-    } else if is_integer_constant(input) {
-      return Some(LexicalElement::IntegerConstant);
-    } else if is_string_constant(input) {
-      return Some(LexicalElement::StringConstant);
-    } 
-  }
-
-  fn is_symbol(input: String) -> bool {
-    let mut is_symbol = false;
-    for symbol in __SYMBOLS__ {
-      if input == symbol {
-        is_symbol = true
-      } else {
-        continue
-      }
-    }
-  }
-
-  fn is_integer_constant(input: String) -> bool {
-    if 
-  }
-
-  fn is_string_constant(input: String) -> bool {
-
-  }
-
-  fn find_keyword(input: String) -> Option<String>{
-
+fn is_whitespace(c: char) -> bool {
+  if c == ' '  ||
+     c == '\t' {
+    return true;
+  } else {
+    return false
   }
 }
