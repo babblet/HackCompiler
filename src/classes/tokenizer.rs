@@ -22,7 +22,7 @@ impl Tokenizer {
         Ok(line) => {
           let chars = line.chars();
           for c in chars {
-            if c == '/' { if cc { break}; cc = true; } else { cc = false }
+            if c == '/' { if cc { break; } cc = true; } else { cc = false; }
             input.push(c);
           }
         },
