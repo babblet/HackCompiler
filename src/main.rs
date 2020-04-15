@@ -17,7 +17,7 @@ fn main() {
 
 
   let input_lines: Vec<OsString> = match File::open(Path::new(&arguments.input)) {
-    Ok(file) => {
+    Ok(mut file) => {
       let mut buffer = String::new();
       match file.read_to_string(&mut buffer) {
         Ok(size) => println!("Read {} bytes", size),
