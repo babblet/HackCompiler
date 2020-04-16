@@ -28,5 +28,13 @@ fn main() {
     _=> panic!("Failed to read file")
   };
 
-  let tokenizer = Tokenizer::new(&input_lines);
+  let mut tokenizer = Tokenizer::new(&input_lines);
+  loop {
+    match tokenizer.advance() {
+      Some(token) => {
+        println!("{}", token.data);
+      },
+      _=>(),
+    };
+  }
 }

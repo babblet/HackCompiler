@@ -22,7 +22,7 @@ impl Tokenizer {
         Ok(line) => {
           let chars = line.chars();
           for c in chars {
-            if c == '/' { if cc { break; } cc = true; } else { cc = false; }
+            if c == '/' { if cc { break; } cc = true; continue; } else { cc = false; }
             input.push(c);
           }
         },
@@ -36,7 +36,7 @@ impl Tokenizer {
   }
 
   fn next(&mut self) -> Option<char> {
-    if self.input_index > self.input.len() { return None; }
+    if self.input_index >= self.input.len() { return None; }
     self.input_index = self.input_index + 1;
     return Some(self.input[self.input_index - 1]);
   }
@@ -54,6 +54,7 @@ impl Tokenizer {
               continue;
             }
           }
+
           current_build.push(c);
 
           match create_token(&current_build) {
