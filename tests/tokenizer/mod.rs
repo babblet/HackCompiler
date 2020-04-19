@@ -7,39 +7,27 @@ mod tokenizer {
 
   #[test]
   fn test_create_token() {
-    let _token = match create_token(&"class".to_string()) {
-      Some(token) => {
-        assert!(token.element == LexicalElement::Keyword);
-        assert_eq!(token.data, "class".to_string());
-        assert_eq!(token.keyword_key, Some(keyword::CLASS));
-      },
-      _=> assert!(false, "Could not create token"),
-    };
+    let token = create_token(LexicalElement::Keyword, &"class".to_string(), Some(keyword::CLASS));
+    assert!(token.element == LexicalElement::Keyword);
+    assert_eq!(token.data, "class".to_string());
+    assert_eq!(token.keyword_key, Some(keyword::CLASS));
   }
 
   #[test]
-  fn test_create_identifier_token() {
-    let token = create_identifier_token(&"some_identifier".to_string());
-    assert!(token.element == LexicalElement::Identifier);
-    assert_eq!(token.data, "some_identifier".to_string());
-    assert_eq!(token.keyword_key, None);
-  }
-
-  #[test]
-  fn test_find_token_type() {
-    assert_eq!(find_token_type(&"}".to_string()), Some(LexicalElement::Symbol));
-    assert_eq!(find_token_type(&"{".to_string()), Some(LexicalElement::Symbol));
-    assert_eq!(find_token_type(&"]".to_string()), Some(LexicalElement::Symbol));
-    assert_eq!(find_token_type(&"20".to_string()), Some(LexicalElement::IntegerConstant));
-    assert_eq!(find_token_type(&"2000000000".to_string()), None);
-    assert_eq!(find_token_type(&"-49".to_string()), None);
-    assert_eq!(find_token_type(&"\"Testing String\"".to_string()), Some(LexicalElement::StringConstant));
+  fn test_find_constant() {
+    assert_eq!(find_constant(&"}".to_string()), None);
+    assert_eq!(find_constant(&"{".to_string()), None);
+    assert_eq!(find_constant(&"]".to_string()), None);
+    assert_eq!(find_constant(&"20".to_string()), Some(LexicalElement::IntegerConstant));
+    assert_eq!(find_constant(&"2000000000".to_string()), None);
+    assert_eq!(find_constant(&"-49".to_string()), None);
+    assert_eq!(find_constant(&"\"Testing String\"".to_string()), Some(LexicalElement::StringConstant));
   }
 
   #[test]
   fn test_is_symbol() {
-    assert_eq!(is_symbol(&"[".to_string()), true);
-    assert_eq!(is_symbol(&"D".to_string()), false);
+    assert_eq!(is_symbol('['), true);
+    assert_eq!(is_symbol('D'), false);
   }
 
   #[test]

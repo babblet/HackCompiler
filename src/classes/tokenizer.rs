@@ -49,22 +49,29 @@ impl Tokenizer {
         Some(c) => {
           if is_whitespace(c) {
             if current_build.len() > 0 {
-              break Some(create_identifier_token(&current_build));
+              break Some(create_token(LexicalElement::Identifier, &current_build, None::<&str>));
             } else {
               continue;
+            }
+          } else if is_symbol(c) {
+            if current_build.len() > 0 {
+              self.input_index = self.input_index - 1;
+              break Some(create_token(LexicalElement::Identifier, &current_build.to_string(), None::<&str>));
+            } else {
+              break Some(create_token(LexicalElement::Symbol, &c.to_string(), None::<&str>));
             }
           }
 
           current_build.push(c);
 
-          match create_token(&current_build) {
+          match find_token(&current_build) {
             Some(token) => break Some(token),
             None => continue,
           };
         },
         None => {
           if current_build.len() > 0 {
-            break Some(create_identifier_token(&current_build));
+            break Some(create_token(LexicalElement::Identifier, &current_build, None::<&str>));
           } else {
             break None;
           }
@@ -74,40 +81,28 @@ impl Tokenizer {
   }
 }
 
-pub fn create_token(input: &String) -> Option<Token> {
-  match find_token_type(input) {
-    Some(token_type) => {
-      Some(Token {
-        element: token_type,
-        data: input.to_string(),
-        keyword_key: None,
-      })
-    },
+pub fn find_token(input: &String) -> Option<Token> {
+  match find_constant(input) {
+    Some(token_type) => Some(create_token(token_type, input, None::<&str>)),
     _ => {
       match find_keyword(input) {
-        Some(key) => Some(Token {
-          element: LexicalElement::Keyword,
-          data: input.to_string(),
-          keyword_key: Some(key),
-        }),
-        _=> None,
+        Some(key) => Some(create_token(LexicalElement::Keyword, input, Some(key))),
+        _ => None,
       }
     },
   }
 }
 
-pub fn create_identifier_token(input: &String) -> Token {
+pub fn create_token(identifier: LexicalElement, data: &String, key: Option<&'static str>) -> Token {
   Token {
-    element: LexicalElement::Identifier,
-    data: input.to_string(),
-    keyword_key: None,
+    element: identifier,
+    data: data.to_string(),
+    keyword_key: key,
   }
 }
 
-pub fn find_token_type(input: &String) -> Option<LexicalElement> {
-  if is_symbol(input) {
-    return Some(LexicalElement::Symbol);
-  } else if is_integer_constant(input) {
+pub fn find_constant(input: &String) -> Option<LexicalElement> {
+  if is_integer_constant(input) {
     return Some(LexicalElement::IntegerConstant);
   } else if is_string_constant(input) {
     return Some(LexicalElement::StringConstant);
@@ -116,9 +111,9 @@ pub fn find_token_type(input: &String) -> Option<LexicalElement> {
   }
 }
 
-pub fn is_symbol(input: &String) -> bool {
+pub fn is_symbol(input: char) -> bool {
   for symbol in SYMBOLS {
-    if input == &symbol.to_string() {
+    if input == *symbol {
       return true;
     } else {
       continue
