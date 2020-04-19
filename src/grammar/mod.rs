@@ -1,11 +1,36 @@
 #[derive(PartialEq, Eq, Copy, Clone, Debug)]
-pub enum LexicalElement {
+pub enum LexicalElementKind {
   Keyword,
   Symbol,
   IntegerConstant,
   StringConstant,
   Identifier,
+}
 
+pub struct LexicalElement {
+  pub kind: LexicalElementKind,
+  pub as_string: String,
+}
+
+impl LexicalElement {
+  pub fn new(kind: LexicalElementKind) -> LexicalElement {
+    let string = match kind {
+      LexicalElementKind::Keyword => "keyword".to_string(),
+      LexicalElementKind::Symbol => "symbol".to_string(),
+      LexicalElementKind::IntegerConstant => "integerConstant".to_string(),
+      LexicalElementKind::StringConstant => "stringConstant".to_string(),
+      LexicalElementKind::Identifier => "identifier".to_string()
+    };
+
+    LexicalElement {
+      kind: kind,
+      as_string: string,
+    }
+  }
+}
+
+pub fn to_string() -> String {
+  "-".to_string()
 }
 
 #[derive(PartialEq, Eq, Copy, Clone, Debug)]
@@ -44,52 +69,93 @@ pub enum Expression {
   KeywordConstant,
 }
 
-pub mod keyword {
-  pub const CLASS: &'static str = "class";
-  pub const METHOD: &'static str = "method";
-  pub const FUNCTION: &'static str = "function";
-  pub const CONSTRUCTOR: &'static str = "constructor";
-  pub const INT: &'static str = "int";
-  pub const BOOLEAN: &'static str = "boolean";
-  pub const CHAR: &'static str = "char";
-  pub const VOID: &'static str = "void";
-  pub const VAR: &'static str = "var";
-  pub const STATIC: &'static str = "static";
-  pub const FIELD: &'static str = "field";
-  pub const LET: &'static str = "let";
-  pub const DO: &'static str = "do";
-  pub const IF: &'static str = "if";
-  pub const ELSE: &'static str = "else";
-  pub const WHILE: &'static str = "while";
-  pub const RETURN: &'static str = "return";
-  pub const TRUE: &'static str = "true";
-  pub const FALSE: &'static str = "false";
-  pub const NULL: &'static str = "null";
-  pub const THIS: &'static str = "this";
+#[derive(PartialEq, Eq, Copy, Clone, Debug)]
+pub enum KeywordKind {
+  CLASS,
+  METHOD,
+  FUNCTION,
+  CONSTRUCTOR,
+  INT,
+  BOOLEAN,
+  CHAR,
+  VOID,
+  VAR,
+  STATIC,
+  FIELD,
+  LET,
+  DO,
+  IF,
+  ELSE,
+  WHILE,
+  RETURN,
+  TRUE,
+  FALSE,
+  NULL,
+  THIS
 }
 
-pub static KEYWORDKEYS: &'static [&'static str] = &[
-  keyword::CLASS,
-  keyword::METHOD,
-  keyword::FUNCTION,
-  keyword::CONSTRUCTOR,
-  keyword::INT,
-  keyword::BOOLEAN,
-  keyword::CHAR,
-  keyword::VOID,
-  keyword::VAR,
-  keyword::STATIC,
-  keyword::FIELD,
-  keyword::LET,
-  keyword::DO,
-  keyword::IF,
-  keyword::ELSE,
-  keyword::WHILE,
-  keyword::RETURN,
-  keyword::TRUE,
-  keyword::FALSE,
-  keyword::NULL,
-  keyword::THIS
-];
+pub struct Keyword {
+  pub kind: KeywordKind,
+  pub as_string: String
+}
+
+impl Keyword {
+  pub fn new(kind: KeywordKind) -> Keyword {
+    let string = match kind {
+      KeywordKind::CLASS => "class".to_string(),
+      KeywordKind::METHOD => "method".to_string(),
+      KeywordKind::FUNCTION => "function".to_string(),
+      KeywordKind::CONSTRUCTOR => "constructor".to_string(),
+      KeywordKind::INT => "int".to_string(),
+      KeywordKind::BOOLEAN => "boolean".to_string(),
+      KeywordKind::CHAR => "char".to_string(),
+      KeywordKind::VOID => "void".to_string(),
+      KeywordKind::VAR => "var".to_string(),
+      KeywordKind::STATIC => "static".to_string(),
+      KeywordKind::FIELD => "field".to_string(),
+      KeywordKind::LET => "let".to_string(),
+      KeywordKind::DO => "do".to_string(),
+      KeywordKind::IF => "if".to_string(),
+      KeywordKind::ELSE => "else".to_string(),
+      KeywordKind::WHILE => "while".to_string(),
+      KeywordKind::RETURN => "return".to_string(),
+      KeywordKind::TRUE => "true".to_string(),
+      KeywordKind::FALSE => "false".to_string(),
+      KeywordKind::NULL => "null".to_string(),
+      KeywordKind::THIS => "this".to_string()
+    };
+
+    Keyword {
+      kind: kind,
+      as_string: string,
+    }
+  }
+
+  pub fn getKindArray() -> [Keyword; 21] {
+    [
+      Keyword::new(KeywordKind::CLASS),
+      Keyword::new(KeywordKind::METHOD),
+      Keyword::new(KeywordKind::FUNCTION),
+      Keyword::new(KeywordKind::CONSTRUCTOR),
+      Keyword::new(KeywordKind::INT),
+      Keyword::new(KeywordKind::BOOLEAN),
+      Keyword::new(KeywordKind::CHAR),
+      Keyword::new(KeywordKind::VOID),
+      Keyword::new(KeywordKind::VAR),
+      Keyword::new(KeywordKind::STATIC),
+      Keyword::new(KeywordKind::FIELD),
+      Keyword::new(KeywordKind::LET),
+      Keyword::new(KeywordKind::DO),
+      Keyword::new(KeywordKind::IF),
+      Keyword::new(KeywordKind::ELSE),
+      Keyword::new(KeywordKind::WHILE),
+      Keyword::new(KeywordKind::RETURN),
+      Keyword::new(KeywordKind::TRUE),
+      Keyword::new(KeywordKind::FALSE),
+      Keyword::new(KeywordKind::NULL),
+      Keyword::new(KeywordKind::THIS)
+    ]
+  }
+}
 
 pub static SYMBOLS: &'static [char] = &['{','}','(',')','[',']','.',',',';','+','-','*','/','&','|','<','>','=','~'];

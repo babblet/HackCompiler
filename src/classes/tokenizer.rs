@@ -1,6 +1,8 @@
 use crate::grammar::LexicalElement;
+use crate::grammar::LexicalElementKind;
 use crate::grammar::SYMBOLS;
-use crate::grammar::KEYWORDKEYS;
+use crate::grammar::Keyword;
+use crate::grammar::KeywordKind;
 use crate::models::token::Token;
 use std::slice::Iter;
 use std::ffi::OsString;
@@ -49,16 +51,28 @@ impl Tokenizer {
         Some(c) => {
           if is_whitespace(c) {
             if current_build.len() > 0 {
-              break Some(create_token(LexicalElement::Identifier, &current_build, None::<&str>));
+              break Some(create_token(LexicalElementKind::Identifier, &current_build, None::<KeywordKind>));
             } else {
               continue;
             }
           } else if is_symbol(c) {
             if current_build.len() > 0 {
               self.input_index = self.input_index - 1;
-              break Some(create_token(LexicalElement::Identifier, &current_build.to_string(), None::<&str>));
+              break Some(
+                create_token(
+                  LexicalElementKind::Identifier,
+                  &current_build.to_string(),
+                  None::<KeywordKind>
+                )
+              );
             } else {
-              break Some(create_token(LexicalElement::Symbol, &c.to_string(), None::<&str>));
+              break Some(
+                create_token(
+                  LexicalElementKind::Symbol,
+                  &c.to_string(),
+                  None::<KeywordKind>
+                )
+              );
             }
           }
 
@@ -71,7 +85,13 @@ impl Tokenizer {
         },
         None => {
           if current_build.len() > 0 {
-            break Some(create_token(LexicalElement::Identifier, &current_build, None::<&str>));
+            break Some(
+              create_token(
+                LexicalElementKind::Identifier,
+                &current_build,
+                None::<KeywordKind>
+              )
+            );
           } else {
             break None;
           }
@@ -83,29 +103,43 @@ impl Tokenizer {
 
 pub fn find_token(input: &String) -> Option<Token> {
   match find_constant(input) {
-    Some(token_type) => Some(create_token(token_type, input, None::<&str>)),
+    Some(token_type) => Some(
+      create_token(token_type,
+        input,
+        None::<KeywordKind>
+      )
+    ),
     _ => {
       match find_keyword(input) {
-        Some(key) => Some(create_token(LexicalElement::Keyword, input, Some(key))),
+        Some(key) => Some(
+          create_token(
+            LexicalElementKind::Keyword,
+            input,
+            Some(key)
+          )
+        ),
         _ => None,
       }
     },
   }
 }
 
-pub fn create_token(identifier: LexicalElement, data: &String, key: Option<&'static str>) -> Token {
+pub fn create_token(identifier: LexicalElementKind, data: &String, key: Option<KeywordKind>) -> Token {
   Token {
-    element: identifier,
+    element: LexicalElement::new(identifier),
     data: data.to_string(),
-    keyword_key: key,
+    keyword_key: match key {
+      Some(_key) => Some(Keyword::new(_key)),
+      None => None,
+    }
   }
 }
 
-pub fn find_constant(input: &String) -> Option<LexicalElement> {
+pub fn find_constant(input: &String) -> Option<LexicalElementKind> {
   if is_integer_constant(input) {
-    return Some(LexicalElement::IntegerConstant);
+    return Some(LexicalElementKind::IntegerConstant);
   } else if is_string_constant(input) {
-    return Some(LexicalElement::StringConstant);
+    return Some(LexicalElementKind::StringConstant);
   } else {
     return None;
   }
@@ -139,10 +173,10 @@ pub fn is_string_constant(input: &String) -> bool {
   if count == 2 { true } else { false }
 }
 
-pub fn find_keyword(input: &String) -> Option<&'static str> {
-  for key in KEYWORDKEYS {
-    if input == key {
-      return Some(*key);
+pub fn find_keyword(input: &String) -> Option<KeywordKind> {
+  for key in &Keyword::getKindArray() {
+    if input == &key.as_string {
+      return Some(key.kind);
     }
   }
   None
