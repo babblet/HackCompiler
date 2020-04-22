@@ -5,6 +5,7 @@ use std::ffi::OsString;
 
 pub struct CompilationEngine {
   input_lines: Vec<OsString>,
+  output_buffer: String,
 }
 
 impl CompilationEngine {
@@ -29,22 +30,70 @@ impl CompilationEngine {
 
     return Ok(CompilationEngine {
       input_lines: lines,
+      output_buffer: String::new(),
     });
   }
 
-  fn compile_class() {}
-  fn compile_class_var_dec() {}
-  fn compile_subroutine_dec() {}
-  fn compile_parameter_list() {}
-  fn compile_subroutine_body() {}
-  fn compile_var_dec() {}
-  fn compile_statements() {}
-  fn compile_let() {}
-  fn compile_if () {}
-  fn compile_while () {}
-  fn compile_do() {}
-  fn compile_return() {}
-  fn compile_expression() {}
-  fn compile_term() {}
-  fn compile_expression_list() {}
+  fn run(self) {
+  }
+
+  fn compile_class() {
+    
+  }
+
+  fn compile_class_var_dec() {
+
+  }
+
+  fn compile_subroutine_dec() {
+
+  }
+
+  fn compile_parameter_list() {
+
+  }
+
+  fn compile_subroutine_body() {
+
+  }
+
+  fn compile_var_dec() {
+
+  }
+
+  fn compile_statements() {
+
+  }
+
+  fn compile_let() {
+
+  }
+
+  fn compile_if () {
+
+  }
+
+  fn compile_while () {
+
+  }
+
+  fn compile_do() {
+
+  }
+
+  fn compile_return() {
+
+  }
+
+  fn compile_expression() {
+
+  }
+
+  fn compile_term() {
+
+  }
+
+  fn compile_expression_list() {
+
+  }
 }

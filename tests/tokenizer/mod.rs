@@ -3,14 +3,28 @@ mod tokenizer {
   use std::ffi::OsString;
   use hack_compiler::classes::tokenizer::*;
   use hack_compiler::grammar::LexicalElement;
-  use hack_compiler::grammar::keyword;
+  use hack_compiler::grammar::LexicalElementKind;
+  use hack_compiler::grammar::Keyword;
+  use hack_compiler::grammar::KeywordKind;
 
   #[test]
   fn test_create_token() {
-    let token = create_token(LexicalElement::Keyword, &"class".to_string(), Some(keyword::CLASS));
-    assert!(token.element == LexicalElement::Keyword);
+    let token = create_token(LexicalElementKind::Keyword, &"class".to_string(), Some(KeywordKind::CLASS));
+    assert_eq!(token.element.kind, LexicalElementKind::Keyword);
+    assert_eq!(token.element.as_string, "keyword".to_string());
     assert_eq!(token.data, "class".to_string());
-    assert_eq!(token.keyword_key, Some(keyword::CLASS));
+
+    let key_was_created = match token.keyword_key {
+      Some(k) => {
+        if k.kind == KeywordKind::CLASS && k.as_string == "class".to_string() {
+          true 
+        } else {
+          false
+        }
+      },
+      _ => false
+    };
+    assert!(key_was_created);
   }
 
   #[test]
@@ -18,10 +32,10 @@ mod tokenizer {
     assert_eq!(find_constant(&"}".to_string()), None);
     assert_eq!(find_constant(&"{".to_string()), None);
     assert_eq!(find_constant(&"]".to_string()), None);
-    assert_eq!(find_constant(&"20".to_string()), Some(LexicalElement::IntegerConstant));
+    assert_eq!(find_constant(&"20".to_string()), Some(LexicalElementKind::IntegerConstant));
     assert_eq!(find_constant(&"2000000000".to_string()), None);
     assert_eq!(find_constant(&"-49".to_string()), None);
-    assert_eq!(find_constant(&"\"Testing String\"".to_string()), Some(LexicalElement::StringConstant));
+    assert_eq!(find_constant(&"\"Testing String\"".to_string()), Some(LexicalElementKind::StringConstant));
   }
 
   #[test]
@@ -48,7 +62,7 @@ mod tokenizer {
 
   #[test]
   fn test_find_keyword() {
-    assert_eq!(find_keyword(&"class".to_string()), Some(keyword::CLASS));
+    assert_eq!(find_keyword(&"class".to_string()), Some(KeywordKind::CLASS));
     assert_eq!(find_keyword(&"classes".to_string()), None);
   }
 

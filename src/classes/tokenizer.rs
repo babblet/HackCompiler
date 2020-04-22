@@ -43,7 +43,7 @@ impl Tokenizer {
     return Some(self.input[self.input_index - 1]);
   }
 
-  pub fn advance(&mut self) -> Option<Token> {
+  pub fn advance(&mut self) -> Result<Token, bool> {
     let mut current_build = String::new();
 
     loop {
@@ -51,14 +51,14 @@ impl Tokenizer {
         Some(c) => {
           if is_whitespace(c) {
             if current_build.len() > 0 {
-              break Some(create_token(LexicalElementKind::Identifier, &current_build, None::<KeywordKind>));
+              break Ok(create_token(LexicalElementKind::Identifier, &current_build, None::<KeywordKind>));
             } else {
               continue;
             }
           } else if is_symbol(c) {
             if current_build.len() > 0 {
               self.input_index = self.input_index - 1;
-              break Some(
+              break Ok(
                 create_token(
                   LexicalElementKind::Identifier,
                   &current_build.to_string(),
@@ -66,7 +66,7 @@ impl Tokenizer {
                 )
               );
             } else {
-              break Some(
+              break Ok(
                 create_token(
                   LexicalElementKind::Symbol,
                   &c.to_string(),
@@ -79,13 +79,13 @@ impl Tokenizer {
           current_build.push(c);
 
           match find_token(&current_build) {
-            Some(token) => break Some(token),
+            Some(token) => break Ok(token),
             None => continue,
           };
         },
         None => {
           if current_build.len() > 0 {
-            break Some(
+            break Ok(
               create_token(
                 LexicalElementKind::Identifier,
                 &current_build,
@@ -93,7 +93,11 @@ impl Tokenizer {
               )
             );
           } else {
-            break None;
+            if self.input.len() <= self.input_index {
+              break Err(false)
+            } else {
+              break Err(true)
+            }
           }
         },
       }

@@ -4,7 +4,7 @@ pub enum LexicalElementKind {
   Symbol,
   IntegerConstant,
   StringConstant,
-  Identifier,
+  Identifier
 }
 
 pub struct LexicalElement {
@@ -27,10 +27,6 @@ impl LexicalElement {
       as_string: string,
     }
   }
-}
-
-pub fn to_string() -> String {
-  "-".to_string()
 }
 
 #[derive(PartialEq, Eq, Copy, Clone, Debug)]
