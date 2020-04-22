@@ -66,6 +66,6 @@ fn main() {
 
   // unsure if this is needed... Should actually sync everything with
   // the tokens if I am not mistaken, and if so then this is a bad implementation.
-  //let compilation_engine = CompilationEngine::new(tokenizer_path, Path::new("c.xml"));
+  //let compilation_engine = CompilationEngine::new(tokens, Path::new("c.xml"));
   //compilation_engine.compile_class();
 }

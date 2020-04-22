@@ -2,43 +2,63 @@ use std::path::Path;
 use std::fs::File;
 use std::io::Read;
 use std::ffi::OsString;
+use create::models::token::Token;
+use create::grammar::LexicalElementKind;
+use create::grammar::KeywordKind;
 
 pub struct CompilationEngine {
-  input_lines: Vec<OsString>,
-  output_buffer: String,
+  input_tokens: Vec<Token>,
+  input_index: usize,
 }
 
 impl CompilationEngine {
-  pub fn new(input: &Path, output: &Path) -> Result<CompilationEngine, String> {
-    let mut in_file: File = match File::open(input) {
-      Ok(file) => file,
-      Err(e) => panic!("Failed to load {}: {}", input.to_str().unwrap(), e)
-    };
-
-    let file_name = match input.file_name() {
-      Some(file_name) => file_name.to_os_string(),
-      None => OsString::from(""),
-    };
-
-    let mut buffer = String::new();
-    match in_file.read_to_string(&mut buffer) {
-      Ok(size) => println!("Read {} bytes from {}", size, input.to_str().unwrap()),
-      Err(e) => println!("Was unable to read from file: {}", e),
-    };
-
-    let lines: Vec<OsString> = buffer.lines().map(|x| OsString::from(x)).collect();
-
-    return Ok(CompilationEngine {
-      input_lines: lines,
-      output_buffer: String::new(),
-    });
+  pub fn new(input_tokens: Vec<Token>) -> CompilationEngine {
+    return CompilationEngine {
+      input_tokens: input_tokens
+      current_token: 0,
+    }
   }
 
-  fn run(self) {
+  pub fn run(self) -> Result<String, String> {
+    match compile_class() {
+      Ok(build) => build,
+      Err(e) => Err(format!("Error: Failed to compile =>\n{}", e))
+    }
   }
 
-  fn compile_class() {
-    
+  fn next(&mut self) -> Some(Token) {
+    if self.input_index >= self.input_tokens.len() { return None; }
+    self.input_index = self.input_index + 1;
+    return Some(self.input_tokens[self.input_index - 1]);
+  }
+
+  fn compile_class(self) -> Result<String, String> {
+    let class_token = match self.next() {
+      Some(token) => {
+        match token.keyword {
+          Some(keyword) => {
+            if keyword.kind == KeywordKind::CLASS {
+              token
+            } else {
+              return Err(format!("Syntax error: Expected class, got {}", keyword.as_string));
+            }
+          },
+          _ => { return Err(format!"Syntax error: Expected class, got {} {}", token.element.as_string, token.data)); }
+        }
+      },
+      _ => { panic!("Was unable to read tokens"); }
+    };
+
+    let class_identifier = match self.next() {
+      Some(token) => {
+        if token.element.kind == LexicalElementKind::Identifier {
+          token
+        } else {
+          return Err(format!("Syntax error: Expected class identifier, got {} {}", token.element.as_string, token.data));
+        }
+      },
+      _ => { panic!("Was unable to read class identifier token"); }
+    }
   }
 
   fn compile_class_var_dec() {

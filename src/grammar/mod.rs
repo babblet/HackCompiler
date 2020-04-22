@@ -30,64 +30,28 @@ impl LexicalElement {
 }
 
 #[derive(PartialEq, Eq, Copy, Clone, Debug)]
-pub enum ProgramStructure {
-  Class,
-  ClassVarDec,
-  Type,
-  SubroutineDec,
-  ParameterList,
-  SubroutineBody,
-  VarDec,
-  ClassName,
-  SubroutineName,
-  VarName,
-}
-
-#[derive(PartialEq, Eq, Copy, Clone, Debug)]
-pub enum Statements {
-  Statements,
-  Statement,
-  LetStatement,
-  IfStatement,
-  WhileStatement,
-  DoStatement,
-  ReturnStatement,
-}
-
-#[derive(PartialEq, Eq, Copy, Clone, Debug)]
-pub enum Expression {
-  Expression,
-  Term,
-  SubroutineCall,
-  ExpressionList,
-  Op,
-  UnaryOp,
-  KeywordConstant,
-}
-
-#[derive(PartialEq, Eq, Copy, Clone, Debug)]
 pub enum KeywordKind {
-  CLASS,
-  METHOD,
-  FUNCTION,
-  CONSTRUCTOR,
-  INT,
-  BOOLEAN,
-  CHAR,
-  VOID,
-  VAR,
-  STATIC,
-  FIELD,
-  LET,
-  DO,
-  IF,
-  ELSE,
-  WHILE,
-  RETURN,
-  TRUE,
-  FALSE,
-  NULL,
-  THIS
+  Class,
+  Method,
+  Function,
+  Constructor,
+  Int,
+  Boolean,
+  Char,
+  Void,
+  Var,
+  Static,
+  Field,
+  Let,
+  Do,
+  If,
+  Else,
+  While,
+  Retrun,
+  True,
+  False,
+  Null,
+  This
 }
 
 pub struct Keyword {
@@ -98,27 +62,27 @@ pub struct Keyword {
 impl Keyword {
   pub fn new(kind: KeywordKind) -> Keyword {
     let string = match kind {
-      KeywordKind::CLASS => "class".to_string(),
-      KeywordKind::METHOD => "method".to_string(),
-      KeywordKind::FUNCTION => "function".to_string(),
-      KeywordKind::CONSTRUCTOR => "constructor".to_string(),
-      KeywordKind::INT => "int".to_string(),
-      KeywordKind::BOOLEAN => "boolean".to_string(),
-      KeywordKind::CHAR => "char".to_string(),
-      KeywordKind::VOID => "void".to_string(),
-      KeywordKind::VAR => "var".to_string(),
-      KeywordKind::STATIC => "static".to_string(),
-      KeywordKind::FIELD => "field".to_string(),
-      KeywordKind::LET => "let".to_string(),
-      KeywordKind::DO => "do".to_string(),
-      KeywordKind::IF => "if".to_string(),
-      KeywordKind::ELSE => "else".to_string(),
-      KeywordKind::WHILE => "while".to_string(),
-      KeywordKind::RETURN => "return".to_string(),
-      KeywordKind::TRUE => "true".to_string(),
-      KeywordKind::FALSE => "false".to_string(),
-      KeywordKind::NULL => "null".to_string(),
-      KeywordKind::THIS => "this".to_string()
+      KeywordKind::Class => "class".to_string(),
+      KeywordKind::Method => "method".to_string(),
+      KeywordKind::Function => "function".to_string(),
+      KeywordKind::Constructor => "constructor".to_string(),
+      KeywordKind::Inta => "int".to_string(),
+      KeywordKind::Boolean => "boolean".to_string(),
+      KeywordKind::Char => "char".to_string(),
+      KeywordKind::Void => "void".to_string(),
+      KeywordKind::Var => "var".to_string(),
+      KeywordKind::Static => "static".to_string(),
+      KeywordKind::Field => "field".to_string(),
+      KeywordKind::Let => "let".to_string(),
+      KeywordKind::Do => "do".to_string(),
+      KeywordKind::If => "if".to_string(),
+      KeywordKind::Else => "else".to_string(),
+      KeywordKind::While => "while".to_string(),
+      KeywordKind::Retrun => "return".to_string(),
+      KeywordKind::True => "true".to_string(),
+      KeywordKind::False => "false".to_string(),
+      KeywordKind::Null => "null".to_string(),
+      KeywordKind::This => "this".to_string()
     };
 
     Keyword {
@@ -129,27 +93,27 @@ impl Keyword {
 
   pub fn getKindArray() -> [Keyword; 21] {
     [
-      Keyword::new(KeywordKind::CLASS),
-      Keyword::new(KeywordKind::METHOD),
-      Keyword::new(KeywordKind::FUNCTION),
-      Keyword::new(KeywordKind::CONSTRUCTOR),
-      Keyword::new(KeywordKind::INT),
-      Keyword::new(KeywordKind::BOOLEAN),
-      Keyword::new(KeywordKind::CHAR),
-      Keyword::new(KeywordKind::VOID),
-      Keyword::new(KeywordKind::VAR),
-      Keyword::new(KeywordKind::STATIC),
-      Keyword::new(KeywordKind::FIELD),
-      Keyword::new(KeywordKind::LET),
-      Keyword::new(KeywordKind::DO),
-      Keyword::new(KeywordKind::IF),
-      Keyword::new(KeywordKind::ELSE),
-      Keyword::new(KeywordKind::WHILE),
-      Keyword::new(KeywordKind::RETURN),
-      Keyword::new(KeywordKind::TRUE),
-      Keyword::new(KeywordKind::FALSE),
-      Keyword::new(KeywordKind::NULL),
-      Keyword::new(KeywordKind::THIS)
+      Keyword::new(KeywordKind::Class),
+      Keyword::new(KeywordKind::Method),
+      Keyword::new(KeywordKind::Function),
+      Keyword::new(KeywordKind::Constructor),
+      Keyword::new(KeywordKind::Int),
+      Keyword::new(KeywordKind::Boolean),
+      Keyword::new(KeywordKind::Char),
+      Keyword::new(KeywordKind::Void),
+      Keyword::new(KeywordKind::Var),
+      Keyword::new(KeywordKind::Static),
+      Keyword::new(KeywordKind::Field),
+      Keyword::new(KeywordKind::Let),
+      Keyword::new(KeywordKind::Do),
+      Keyword::new(KeywordKind::If),
+      Keyword::new(KeywordKind::Else),
+      Keyword::new(KeywordKind::While),
+      Keyword::new(KeywordKind::Retrun),
+      Keyword::new(KeywordKind::True),
+      Keyword::new(KeywordKind::False),
+      Keyword::new(KeywordKind::Null),
+      Keyword::new(KeywordKind::This)
     ]
   }
 }

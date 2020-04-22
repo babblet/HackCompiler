@@ -9,14 +9,14 @@ mod tokenizer {
 
   #[test]
   fn test_create_token() {
-    let token = create_token(LexicalElementKind::Keyword, &"class".to_string(), Some(KeywordKind::CLASS));
+    let token = create_token(LexicalElementKind::Keyword, &"class".to_string(), Some(KeywordKind::Class));
     assert_eq!(token.element.kind, LexicalElementKind::Keyword);
     assert_eq!(token.element.as_string, "keyword".to_string());
     assert_eq!(token.data, "class".to_string());
 
     let key_was_created = match token.keyword_key {
       Some(k) => {
-        if k.kind == KeywordKind::CLASS && k.as_string == "class".to_string() {
+        if k.kind == KeywordKind::Class && k.as_string == "class".to_string() {
           true 
         } else {
           false
@@ -62,7 +62,7 @@ mod tokenizer {
 
   #[test]
   fn test_find_keyword() {
-    assert_eq!(find_keyword(&"class".to_string()), Some(KeywordKind::CLASS));
+    assert_eq!(find_keyword(&"class".to_string()), Some(KeywordKind::Class));
     assert_eq!(find_keyword(&"classes".to_string()), None);
   }
 
