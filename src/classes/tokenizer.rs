@@ -1,16 +1,16 @@
+use std::ffi::OsString;
+use crate::grammar::IdentifierKind;
 use crate::grammar::LexicalElement;
 use crate::grammar::LexicalElementKind;
 use crate::grammar::SYMBOLS;
 use crate::grammar::Keyword;
 use crate::grammar::KeywordKind;
 use crate::models::token::Token;
-use std::slice::Iter;
-use std::ffi::OsString;
-use std::str::Chars;
 
 pub struct Tokenizer {
   pub input: Vec<char>,
   pub input_index: usize,
+  latest_token: Option<Token>
 }
 
 impl Tokenizer {
@@ -34,6 +34,7 @@ impl Tokenizer {
     Tokenizer {
       input: input,
       input_index: 0,
+      latest_token: None
     }
   }
 
@@ -51,7 +52,7 @@ impl Tokenizer {
         Some(c) => {
           if is_whitespace(c) {
             if current_build.len() > 0 {
-              break Ok(create_token(LexicalElementKind::Identifier, &current_build, None::<KeywordKind>));
+              break Ok(self.create_identifier_token(&current_build.to_string()));
             } else {
               continue;
             }
@@ -59,18 +60,15 @@ impl Tokenizer {
             if current_build.len() > 0 {
               self.input_index = self.input_index - 1;
               break Ok(
-                create_token(
-                  LexicalElementKind::Identifier,
+                self.create_identifier_token(
                   &current_build.to_string(),
-                  None::<KeywordKind>
                 )
               );
             } else {
               break Ok(
-                create_token(
+                self.create_plain_token(
                   LexicalElementKind::Symbol,
                   &c.to_string(),
-                  None::<KeywordKind>
                 )
               );
             }
@@ -78,7 +76,7 @@ impl Tokenizer {
 
           current_build.push(c);
 
-          match find_token(&current_build) {
+          match self.find_token(&current_build) {
             Some(token) => break Ok(token),
             None => continue,
           };
@@ -86,11 +84,7 @@ impl Tokenizer {
         None => {
           if current_build.len() > 0 {
             break Ok(
-              create_token(
-                LexicalElementKind::Identifier,
-                &current_build,
-                None::<KeywordKind>
-              )
+              self.create_identifier_token(&current_build.to_string())
             );
           } else {
             if self.input.len() <= self.input_index {
@@ -103,39 +97,62 @@ impl Tokenizer {
       }
     }
   }
-}
 
-pub fn find_token(input: &String) -> Option<Token> {
-  match find_constant(input) {
-    Some(token_type) => Some(
-      create_token(token_type,
-        input,
-        None::<KeywordKind>
-      )
-    ),
-    _ => {
-      match find_keyword(input) {
-        Some(key) => Some(
-          create_token(
-            LexicalElementKind::Keyword,
-            input,
-            Some(key)
-          )
-        ),
-        _ => None,
-      }
-    },
+  pub fn create_plain_token(self, element: LexicalElementKind, data: &String) -> Token {
+    return create_token(element, data, None::<KeywordKind>, None::<IdentifierKind>);
+  }
+  
+  pub fn create_keyword_token(self, data: &String, keyword_kind: KeywordKind) -> Token {
+    return create_token(LexicalElementKind::Keyword, data, Some(keyword_kind), None::<IdentifierKind>);
+  }
+  
+  pub fn create_identifier_token(self, data: &String) -> Token {
+    let latest_token_keyword_kind = self.latest_token.unwrap().keyword_data.unwrap().kind;
+    let identifier_kind = match latest_token_keyword_kind {
+      KeywordKind::Method      |
+      KeywordKind::Function    |
+      KeywordKind::Constructor => IdentifierKind::SubroutineName,
+      KeywordKind::Class       => IdentifierKind::ClassName,
+      _ => IdentifierKind::VarName
+    };
+    return create_token(LexicalElementKind::Identifier, data, None::<KeywordKind>, Some(identifier_kind));
+  }
+
+  pub fn find_token(self, input: &String) -> Option<Token> {
+    match find_constant(input) {
+      Some(token_type) => Some(
+        self.create_plain_token(
+          token_type,
+          input
+        )
+      ),
+      _ => {
+        match find_keyword(input) {
+          Some(key) => Some(
+            self.create_keyword_token(
+              input,
+              key
+            )
+          ),
+          _ => None,
+        }
+      },
+    }
   }
 }
 
-pub fn create_token(identifier: LexicalElementKind, data: &String, key: Option<KeywordKind>) -> Token {
+pub fn create_token (element: LexicalElementKind, data: &String, keyword_kind: Option<KeywordKind>, identifier_kind: Option<IdentifierKind>) -> Token {
   Token {
-    element: LexicalElement::new(identifier),
+    element: LexicalElement::new(element),
     data: data.to_string(),
-    keyword_key: match key {
-      Some(_key) => Some(Keyword::new(_key)),
+    keyword_data: match keyword_kind {
+      Some(kind) => Some(Keyword::new(kind)),
       None => None,
-    }
+    },
+    identifier_kind: match identifier_kind {
+      Some(_kind) => Some(_kind),
+      None => None,
+    },
   }
 }
 

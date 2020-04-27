@@ -30,6 +30,13 @@ impl LexicalElement {
 }
 
 #[derive(PartialEq, Eq, Copy, Clone, Debug)]
+pub enum IdentifierKind {
+  ClassName,
+  SubroutineName,
+  VarName
+}
+
+#[derive(PartialEq, Eq, Copy, Clone, Debug)]
 pub enum KeywordKind {
   Class,
   Method,
@@ -56,7 +63,7 @@ pub enum KeywordKind {
 
 pub struct Keyword {
   pub kind: KeywordKind,
-  pub as_string: String
+  pub as_string: String,
 }
 
 impl Keyword {
@@ -66,7 +73,7 @@ impl Keyword {
       KeywordKind::Method => "method".to_string(),
       KeywordKind::Function => "function".to_string(),
       KeywordKind::Constructor => "constructor".to_string(),
-      KeywordKind::Inta => "int".to_string(),
+      KeywordKind::Int => "int".to_string(),
       KeywordKind::Boolean => "boolean".to_string(),
       KeywordKind::Char => "char".to_string(),
       KeywordKind::Void => "void".to_string(),

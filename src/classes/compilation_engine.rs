@@ -1,51 +1,46 @@
-use std::path::Path;
-use std::fs::File;
-use std::io::Read;
-use std::ffi::OsString;
-use create::models::token::Token;
-use create::grammar::LexicalElementKind;
-use create::grammar::KeywordKind;
+use crate::models::token::Token;
+use crate::grammar::KeywordKind;
+use crate::grammar::LexicalElementKind;
+use crate::grammar::IdentifierKind;
 
 pub struct CompilationEngine {
   input_tokens: Vec<Token>,
   input_index: usize,
-  pub output_string: String,
 }
 
 impl CompilationEngine {
   pub fn new(input_tokens: Vec<Token>) -> CompilationEngine {
     return CompilationEngine {
-      input_tokens: input_tokens
-      current_token: 0,
+      input_tokens: input_tokens,
+      input_index: 0
     }
   }
 
   pub fn run(self) -> Result<String, String> {
-    match compile_class() {
-      Ok(build) => build,
+    match self.compile_class() {
+      Ok(build) => Ok(build),
       Err(e) => Err(format!("Error: Failed to compile,\n{}", e))
     }
   }
 
-  fn next(&mut self) -> Some(Token) {
+  fn next(&mut self) -> Option<Token> {
     if self.input_index >= self.input_tokens.len() { return None; }
     self.input_index = self.input_index + 1;
     return Some(self.input_tokens[self.input_index - 1]);
   }
 
   fn compile_class(mut self) -> Result<String, String> {
-
     let class_key = match self.next() {
       Some(token) => {
-        match token.keyword {
+        match token.keyword_data {
           Some(keyword) => {
-            if keyword.kind == KeywordKind::CLASS {
-              token
+            if keyword.kind == KeywordKind::Class {
+              format!("<keyword> {} </keyword>", token.data)
             } else {
               return Err(format!(""));
             }
           },
-          _ => { return Err(format!("")); }
+          _ => { return Err(format!("")); },
         }
       },
       _ => { panic!("Was unable to read tokens"); }
@@ -54,19 +49,19 @@ impl CompilationEngine {
     let class_identifier = match self.next() {
       Some(token) => {
         if token.element.kind == LexicalElementKind::Identifier {
-          token
+          format!("<identifier> {} </identifier>", token.data);
         } else {
           return Err(format!(""));
         }
       },
       _ => { panic!("Was unable to read class identifier token"); }
-    }
-    
+    };
+
     let class_opening_bracket = match self.next() {
       Some(token) => {
         if token.element.kind == LexicalElementKind::Symbol {
           if token.data.as_str() == "{" {
-            token
+            format!("<symbol> {} </symbol>", token.data);
           } else {
             return Err(format!(""));
           }
@@ -75,23 +70,23 @@ impl CompilationEngine {
         }
       },
       _ => { panic!("Was unable to read class identifier token"); }
-    }
+    };
 
     let class_variables = match self.compile_class_var_dec() {
       Ok(variables) => variables,
       Err(e) => return Err(format!(""))
-    }
+    };
 
     let class_subroutines = match self.compile_subroutine_dec() {
       Ok(subroutines) => subroutines,
       Err(e) => return Err(format!(""))
-    }
+    };
 
     let class_closing_bracket = match self.next() {
       Some(token) => {
         if token.element.kind == LexicalElementKind::Symbol {
           if token.data.as_str() == "{" {
-            token
+            format!("<symbol> {} </symbol>", token.data);
           } else {
             return Err(format!(""));
           }
@@ -100,11 +95,11 @@ impl CompilationEngine {
         }
       },
       _ => { panic!("Was unable to read class identifier token"); }
-    }
+    };
 
     return Ok(
       format!(
-        """
+        "
         <class>\n
         \t{}\n
         \t{}\n
@@ -113,7 +108,7 @@ impl CompilationEngine {
         \t\t{}\n
         \t{}\n
         </class>\n
-        """,
+        ",
         class_key,
         class_identifier,
         class_opening_bracket,
@@ -124,16 +119,59 @@ impl CompilationEngine {
     )
   }
 
-  fn compile_class_var_dec(self) Result<String, String> {
+  fn compile_class_var_dec(mut self) -> Result<String, String> {
     let output_string = String::new();
 
     loop {
-      match self.next() {}assert!()
+      match self.next() {
+        Some(token) => {
+          match token.keyword_data {
+            Some(keyword) => {
+              if keyword.kind == KeywordKind::Field ||
+                 keyword.kind == KeywordKind::Static {
+                output_string.push_str(token.data.as_str());
+              } else {
+                self.input_index = self.input_index - 1;
+                return Ok("".to_string());
+              }
+            },
+            _=> return Err(format!(""))
+          }
+        },
+        _ => return Err(format!(""))
+      }
+      match self.next() {
+        Some(token) => {
+          if token.element.kind == LexicalElementKind::Identifier {
+            match token.identifier_kind {
+              Some(kind) => {
+                if kind == IdentifierKind::ClassName {
+                  output_string.push_str(token.data.as_str()); 
+                } else {
+                  return Err(format!(""));
+                }
+              }
+            }
+          } else {
+            match token.keyword_data {
+              Some(keyword) => {
+                if keyword.kind == KeywordKind::Int ||
+                   keyword.kind == KeywordKind::Boolean ||
+                   keyword.kind == KeywordKind::Char {
+                  output_string.push_str(token.data.as_str()); 
+                } else {
+                  return Err(format!(""))
+                }
+              },
+            }
+          }
+        }
+      }
     }
   }
 
-  fn compile_subroutine_dec() {
-
+  fn compile_subroutine_dec(mut self) -> Result<String, String> {
+    Ok("".to_string())
   }
 
   fn compile_parameter_list() {
