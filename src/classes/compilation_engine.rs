@@ -120,7 +120,7 @@ impl CompilationEngine {
   }
 
   fn compile_class_var_dec(&mut self) -> Result<String, String> {
-    let mut output_string = String::new();
+    let mut output_string = "<classVarDec>\n".to_string();
 
     loop {
       match self.next() {
@@ -129,7 +129,7 @@ impl CompilationEngine {
             Some(keyword) => {
               if keyword.kind == KeywordKind::Field ||
                  keyword.kind == KeywordKind::Static {
-                output_string.push_str(token.data.as_str());
+                output_string.push_str(format!("<keyword> {} </keyword>\n", token.data.as_str()));
               } else {
                 self.input_index = self.input_index - 1;
                 return Ok("".to_string());
@@ -140,13 +140,14 @@ impl CompilationEngine {
         },
         _ => return Err(format!(""))
       }
+
       match self.next() {
         Some(token) => {
           if token.element.kind == LexicalElementKind::Identifier {
             match token.identifier_kind {
               Some(kind) => {
                 if kind == IdentifierKind::ClassName {
-                  output_string.push_str(token.data.as_str()); 
+                  output_string.push_str(format!("<identifier> {} </identifier>\n",token.data.as_str())); 
                 } else {
                   return Err(format!(""));
                 }
@@ -159,7 +160,7 @@ impl CompilationEngine {
                 if keyword.kind == KeywordKind::Int ||
                    keyword.kind == KeywordKind::Boolean ||
                    keyword.kind == KeywordKind::Char {
-                  output_string.push_str(token.data.as_str()); 
+                  output_string.push_str(format!("<keyword> {} </keyword>\n",token.data.as_str())); 
                 } else {
                   return Err(format!(""))
                 }
@@ -170,20 +171,101 @@ impl CompilationEngine {
         },
         None => return Err(format!(""))
       }
+
+      loop {
+        match self.next() {
+          Some(token) => {
+            match token.identifier_kind {
+              Some(kind) => {
+                if kind == IdentifierKind::VarName {
+                  output_string.push_str(format!("<identifier> {} </identifier>\n", token.data.as_str()));
+                } else {
+                  None => return Err(format!(""))
+                }
+              },
+              None => return Err(format!(""))
+            }
+          },
+          None => return Err(format!(""))
+        };
+        match self.next() {
+          Some(token) => {
+            if token.element == LexicalElementKind::Symbol {
+              if token.data.as_str() == "," {
+                output_string.push_str(format!("<symbol> {} </symbol>\n", token.data.as_str()));
+              } else if token.data.as_str() == ";" {
+                output_string.push_str(format!("<symbol> {} </symbol>\n", token.data.as_str()));
+                break;
+              } else {
+                return Err(format!(""))
+              }
+            } else {
+              return Err(format!(""))
+            }
+          },
+          None => return Err(format!(""))
+        }
+      }
     }
+    output_string.push_str(format!("</classVarDec>\n").to_string());
+    return Ok(output_string);
   }
 
   fn compile_subroutine_dec(&mut self) -> Result<String, String> {
-    Ok("".to_string())
-    //loop {
-    //  match self.next() {
-    //    Some(token) => {
-    //      match token.keyword_data {
-    //      }
-    //    },
-    //    None => return Err(format!(""))
-    //  }
-    //}
+    let mut output_string = "<subroutineDec>\n".to_string();
+    loop {
+      match self.next() {
+        Some(token) => {
+          match token.keyword_data {
+            Some(keyword) {
+              if keyword.kind == KeywordKind::Method ||
+                 keyword.kind == KeywordKind::Function ||
+                 keyword.kind == KeywordKind::Constructor {
+                output_string.push_str(format!("<keyword> {} </>\n", token.data.as_str()));
+              } else {
+                return Err(format!(""));
+              }
+            },
+            None => return Err(format!(""))
+          };
+        },
+        None => return Err(format!(""))
+      }
+
+      match self.next() {
+        Some(token) => {
+          match token.identifier_kind {
+            Some(kind) => {
+              if kind == IdentifierKind::ClassName {
+                output_string.push_str(format!("<identifier> {} </identifier>\n", token.data.as_str()));
+              } else {
+                None => return Err(format!{""})
+              }
+            },
+            None => {
+              match token.keyword_data {
+                Some(keyword) => {
+                  match keyword.kind {
+                    KeywordKind::Int  |
+                    KeywordKind::Void |
+                    KeywordKind::Char |
+                    KeywordKind::Boolean => {
+                      output_string.push_str(format!("<keyword> {} </keyword>", token.data.as_str())); 
+                    },
+                    _ => return Err(format!(""))
+                  };
+                },
+                None => return Err(format!(""))
+              };
+            }
+          };
+        },
+        None => return Err(format!{""})
+      }
+    }
+
+    let mut output_string = "</subroutineDec>\n".to_string();
+    return Ok(output_string);
   }
 
   fn compile_parameter_list() {

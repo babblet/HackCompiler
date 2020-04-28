@@ -64,7 +64,7 @@ mod compilation_engine {
 
   #[test]
   fn compile_term() {
-    assert_eq!(true, false)
+    assert_eq!(true, false) 
   }
 
   #[test]
