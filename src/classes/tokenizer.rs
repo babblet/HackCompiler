@@ -10,7 +10,7 @@ use crate::models::token::Token;
 pub struct Tokenizer {
   pub input: Vec<char>,
   pub input_index: usize,
-  latest_token: Option<Token>
+  pub latest_token: Option<Token>
 }
 
 impl Tokenizer {
@@ -98,27 +98,36 @@ impl Tokenizer {
     }
   }
 
-  pub fn create_plain_token(self, element: LexicalElementKind, data: &String) -> Token {
+  pub fn create_plain_token(&self, element: LexicalElementKind, data: &String) -> Token {
     return create_token(element, data, None::<KeywordKind>, None::<IdentifierKind>);
   }
   
-  pub fn create_keyword_token(self, data: &String, keyword_kind: KeywordKind) -> Token {
+  pub fn create_keyword_token(&self, data: &String, keyword_kind: KeywordKind) -> Token {
     return create_token(LexicalElementKind::Keyword, data, Some(keyword_kind), None::<IdentifierKind>);
   }
   
-  pub fn create_identifier_token(self, data: &String) -> Token {
-    let latest_token_keyword_kind = self.latest_token.unwrap().keyword_data.unwrap().kind;
-    let identifier_kind = match latest_token_keyword_kind {
-      KeywordKind::Method      |
-      KeywordKind::Function    |
-      KeywordKind::Constructor => IdentifierKind::SubroutineName,
-      KeywordKind::Class       => IdentifierKind::ClassName,
-      _ => IdentifierKind::VarName
+  pub fn create_identifier_token(&self, data: &String) -> Token {
+    match &self.latest_token {
+      Some(token) => {
+        match &token.keyword_data {
+          Some(keyword) => {
+            let identifier_kind = match keyword.kind {
+              KeywordKind::Method      |
+              KeywordKind::Function    |
+              KeywordKind::Constructor => IdentifierKind::SubroutineName,
+              KeywordKind::Class       => IdentifierKind::ClassName,
+              _ => IdentifierKind::VarName
+            };
+            return create_token(LexicalElementKind::Identifier, data, None::<KeywordKind>, Some(identifier_kind));
+          },
+          _ => panic!()
+        };
+      },
+      _ => panic!()
     };
-    return create_token(LexicalElementKind::Identifier, data, None::<KeywordKind>, Some(identifier_kind));
   }
 
-  pub fn find_token(self, input: &String) -> Option<Token> {
+  pub fn find_token(&self, input: &String) -> Option<Token> {
     match find_constant(input) {
       Some(token_type) => Some(
         self.create_plain_token(

@@ -4,8 +4,8 @@ use crate::grammar::LexicalElementKind;
 use crate::grammar::IdentifierKind;
 
 pub struct CompilationEngine {
-  input_tokens: Vec<Token>,
-  input_index: usize,
+  pub input_tokens: Vec<Token>,
+  pub input_index: usize,
 }
 
 impl CompilationEngine {
@@ -16,23 +16,23 @@ impl CompilationEngine {
     }
   }
 
-  pub fn run(self) -> Result<String, String> {
+  pub fn run(mut self) -> Result<String, String> {
     match self.compile_class() {
       Ok(build) => Ok(build),
       Err(e) => Err(format!("Error: Failed to compile,\n{}", e))
     }
   }
 
-  fn next(&mut self) -> Option<Token> {
+  fn next(&mut self) -> Option<&Token> {
     if self.input_index >= self.input_tokens.len() { return None; }
     self.input_index = self.input_index + 1;
-    return Some(self.input_tokens[self.input_index - 1]);
+    return Some(&self.input_tokens[self.input_index - 1]);
   }
 
-  fn compile_class(mut self) -> Result<String, String> {
+  fn compile_class(&mut self) -> Result<String, String> {
     let class_key = match self.next() {
       Some(token) => {
-        match token.keyword_data {
+        match &token.keyword_data {
           Some(keyword) => {
             if keyword.kind == KeywordKind::Class {
               format!("<keyword> {} </keyword>", token.data)
@@ -49,7 +49,7 @@ impl CompilationEngine {
     let class_identifier = match self.next() {
       Some(token) => {
         if token.element.kind == LexicalElementKind::Identifier {
-          format!("<identifier> {} </identifier>", token.data);
+          format!("<identifier> {} </identifier>", token.data)
         } else {
           return Err(format!(""));
         }
@@ -61,7 +61,7 @@ impl CompilationEngine {
       Some(token) => {
         if token.element.kind == LexicalElementKind::Symbol {
           if token.data.as_str() == "{" {
-            format!("<symbol> {} </symbol>", token.data);
+            format!("<symbol> {} </symbol>", token.data)
           } else {
             return Err(format!(""));
           }
@@ -86,7 +86,7 @@ impl CompilationEngine {
       Some(token) => {
         if token.element.kind == LexicalElementKind::Symbol {
           if token.data.as_str() == "{" {
-            format!("<symbol> {} </symbol>", token.data);
+            format!("<symbol> {} </symbol>", token.data)
           } else {
             return Err(format!(""));
           }
@@ -119,13 +119,13 @@ impl CompilationEngine {
     )
   }
 
-  fn compile_class_var_dec(mut self) -> Result<String, String> {
-    let output_string = String::new();
+  fn compile_class_var_dec(&mut self) -> Result<String, String> {
+    let mut output_string = String::new();
 
     loop {
       match self.next() {
         Some(token) => {
-          match token.keyword_data {
+          match &token.keyword_data {
             Some(keyword) => {
               if keyword.kind == KeywordKind::Field ||
                  keyword.kind == KeywordKind::Static {
@@ -150,10 +150,11 @@ impl CompilationEngine {
                 } else {
                   return Err(format!(""));
                 }
-              }
+              },
+              None => return Err(format!(""))
             }
           } else {
-            match token.keyword_data {
+            match &token.keyword_data {
               Some(keyword) => {
                 if keyword.kind == KeywordKind::Int ||
                    keyword.kind == KeywordKind::Boolean ||
@@ -163,14 +164,16 @@ impl CompilationEngine {
                   return Err(format!(""))
                 }
               },
+              None => return Err(format!(""))
             }
           }
-        }
+        },
+        None => return Err(format!(""))
       }
     }
   }
 
-  fn compile_subroutine_dec(mut self) -> Result<String, String> {
+  fn compile_subroutine_dec(&mut self) -> Result<String, String> {
     Ok("".to_string())
   }
 
