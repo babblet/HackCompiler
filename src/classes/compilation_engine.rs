@@ -175,6 +175,15 @@ impl CompilationEngine {
 
   fn compile_subroutine_dec(&mut self) -> Result<String, String> {
     Ok("".to_string())
+    //loop {
+    //  match self.next() {
+    //    Some(token) => {
+    //      match token.keyword_data {
+    //      }
+    //    },
+    //    None => return Err(format!(""))
+    //  }
+    //}
   }
 
   fn compile_parameter_list() {
